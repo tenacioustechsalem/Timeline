@@ -613,9 +613,7 @@
             if (headerRow && headerRow.cells[columnIndex + 1]) {
                 headerRow.cells[columnIndex + 1].classList.add('highlight-time-header');
             }
-        }
-
-        function addHighlightEventListeners() {
+        }        function addHighlightEventListeners() {
             const table = document.querySelector('table');
             if (!table) return;
 
@@ -626,8 +624,16 @@
                     
                     // Find row and column indices
                     const row = cell.closest('tr');
-                    const rowIndex = Array.from(table.rows).indexOf(row) - 1; // -1 because of header
+                    let rowIndex = Array.from(table.rows).indexOf(row) - 1; // -1 because of header
                     const columnIndex = Array.from(row.cells).indexOf(cell) - 1; // -1 because of event title column
+                    
+                    // Adjust rowIndex if there's a description row above the clicked row
+                    if (currentExpandedRow) {
+                        const expandedRowIndex = Array.from(table.rows).indexOf(currentExpandedRow);
+                        if (expandedRowIndex <= Array.from(table.rows).indexOf(row)) {
+                            rowIndex = rowIndex - 1; // Adjust for the description row that will be removed
+                        }
+                    }
                     
                     if (currentHighlightedRow === rowIndex && currentHighlightedColumn === columnIndex) {
                         // If clicking the same cell, clear highlights
@@ -642,12 +648,24 @@
                 cell.addEventListener('click', function(e) {
                     e.stopPropagation();
                     
-                    if (currentHighlightedRow === index && currentHighlightedColumn === -1) {
+                    // Get the actual row index by finding the row in the table
+                    const row = cell.closest('tr');
+                    let rowIndex = Array.from(table.rows).indexOf(row) - 1; // -1 because of header
+                    
+                    // Adjust rowIndex if there's a description row above the clicked row
+                    if (currentExpandedRow) {
+                        const expandedRowIndex = Array.from(table.rows).indexOf(currentExpandedRow);
+                        if (expandedRowIndex <= Array.from(table.rows).indexOf(row)) {
+                            rowIndex = rowIndex - 1; // Adjust for the description row that will be removed
+                        }
+                    }
+                    
+                    if (currentHighlightedRow === rowIndex && currentHighlightedColumn === -1) {
                         // If clicking the same event title, clear highlights
                         clearAllHighlights();
                     } else {
                         // Highlight just the row
-                        highlightRow(index);
+                        highlightRow(rowIndex);
                     }
                 });
             });
