@@ -78,7 +78,8 @@
         .event-title {
             background: #2c3e50;
             color: #fff;
-            padding: 12px;
+            padding: 4px;
+            padding-left: 20px;
             font-weight: bold;
             border: 1px solid #34495e;
             min-width: 200px;
@@ -98,11 +99,15 @@
             min-width: 20px;
             height: 50px;
             background: rgba(255, 255, 255, 0.02);
-        }
-
-        .time-slot.filled {
+        }        .time-slot.filled {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             position: relative;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            vertical-align: middle;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
         }
 
         .time-slot.filled::after {
@@ -114,6 +119,17 @@
             bottom: 0;
             background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.1) 75%);
             background-size: 8px 8px;
+            pointer-events: none;
+        }        .time-slot.filled .time-text {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
         }
 
         .type-official { background: linear-gradient(135deg, #3498db, #2980b9) !important; }
@@ -147,13 +163,118 @@
             width: 20px;
             height: 20px;
             border-radius: 4px;
-        }
-
-        .no-events {
+        }        .no-events {
             text-align: center;
             padding: 40px;
             color: #bdc3c7;
             font-size: 18px;
+        }
+        /* Highlighting styles */
+        .highlight-row {
+            background-color: rgba(2, 144, 183, 0.674) !important;
+            box-shadow: inset 0 0 0 2px rgb(0, 217, 255) !important;
+        }
+
+        .highlight-column {
+            background-color: rgba(2, 144, 183, 0.2) !important;
+            box-shadow: inset 0 0 0 2px rgb(0, 217, 255) !important;
+        }
+
+        .highlight-event-title {
+            background-color: rgba(2, 144, 183, 0.4) !important;
+            box-shadow: inset 0 0 0 3px rgb(0, 217, 255) !important;
+            text-shadow: 0 0 5px rgba(0, 217, 255, 0.8) !important;
+        }
+
+        .highlight-time-header {
+            background-color: rgba(2, 144, 183, 0.4) !important;
+            box-shadow: inset 0 0 0 3px rgb(0, 217, 255) !important;
+            text-shadow: 0 0 5px rgba(0, 217, 255, 0.8) !important;
+        }
+
+        .time-slot, .event-title, .time-header {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }        .time-slot:hover, .event-title:hover, .time-header:hover {
+            opacity: 0.8;
+        }        /* Expandable Event Description Row */
+        .event-description-row {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #ffd700;
+            animation: expandRow 0.3s ease-in-out;
+        }
+
+        @keyframes expandRow {
+            from { 
+                opacity: 0; 
+                height: 0;
+                transform: scaleY(0);
+            }
+            to { 
+                opacity: 1; 
+                height: auto;
+                transform: scaleY(1);
+            }
+        }
+
+        .event-description-cell {
+            padding: 20px;
+            color: #fff;
+            border: 1px solid #34495e;
+        }
+
+        .event-description-cell h3 {
+            color: #ffd700;
+            margin: 0 0 15px 0;
+            font-size: 1.4em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .event-description-cell .event-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #bdc3c7;
+        }
+
+        .event-description-cell .event-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .event-description-cell .description-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #ecf0f1;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffd700;
+        }
+
+        .close-description {
+            float: right;
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            margin-top: -5px;
+        }
+
+        .close-description:hover {
+            background-color: rgba(255, 215, 0, 0.2);
         }
     </style>
 </head>
@@ -205,95 +326,90 @@
                 <span>Discussion</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color type-food"></div>
-                <span>Food</span>
-            </div>
+                <div class="legend-color type-food"></div>                <span>Food</span>            </div>
         </div>
     </div>
 
-    <script>
-        const events = [
+    <script>const events = [
             // Wednesday, June 18
-            { day: 'Wed 6/18', time: '10:00', duration: 120, title: 'Merchant Arrival', location: '', host: '', type: 'official' },
-            { day: 'Wed 6/18', time: '12:00', duration: 120, title: 'Dock Arrival', location: '', host: '', type: 'official' },
-            { day: 'Wed 6/18', time: '14:00', duration: 120, title: 'Volunteer Arrival', location: '', host: '', type: 'official' },
+            { day: 'Wed 6/18', time: '10:00', duration: 120, title: 'Merchant Arrival', location: '', host: '', type: 'official', description: 'Merchant Arrival begins at 10 AM' },
+            { day: 'Wed 6/18', time: '12:00', duration: 120, title: 'Dock Arrival', location: '', host: '', type: 'official', description: 'Dock Arrival begins at 12 PM' },
+            { day: 'Wed 6/18', time: '14:00', duration: 120, title: 'Volunteer Arrival', location: '', host: '', type: 'official', description: 'Volunteer Arrival begins at 2 PM' },
             
             // Thursday, June 19
-            { day: 'Thu 6/19', time: '09:00', duration: 120, title: 'Land Grant Arrival', location: '', host: '', type: 'official' },
-            { day: 'Thu 6/19', time: '20:00', duration: 60, title: 'Show \'em the ropes', location: 'Crimson Corsair', host: 'Captain Wreckless', type: 'crafts' },
+            { day: 'Thu 6/19', time: '09:00', duration: 120, title: 'Land Grant Arrival', location: '', host: '', type: 'official', description: 'Land Grant Arrival begins at 9 AM' },
+            { day: 'Thu 6/19', time: '20:00', duration: 60, title: 'Show \'em the ropes', location: 'Crimson Corsair', host: 'Captain Wreckless', type: 'crafts', description: 'A show and tell social for all fans of fibers. Nautical rope and knot work displays and tutorials. Bring your prized knots or knotty creations to show off. Nerds Ropes served to the first 10 attendees!' },
             
             // Friday, June 20
-            { day: 'Fri 6/20', time: '10:00', duration: 60, title: 'MTG Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen' },
-            { day: 'Fri 6/20', time: '10:00', duration: 60, title: 'Spear Toss', location: 'Spear Range', host: 'Gerard', type: 'combat' },
-            { day: 'Fri 6/20', time: '10:00', duration: 420, title: 'Monkey See, Money Do Trading Booth', location: 'Revenant Embrace', host: 'Lynn Butterfield', type: 'trading' },
-            { day: 'Fri 6/20', time: '10:00', duration: 480, title: 'Fair Winds Lottery', location: 'Fair Winds Lottery Booth', host: 'Spymaster Kerberus', type: 'games' },
-            { day: 'Fri 6/20', time: '12:00', duration: 30, title: 'Longest John - Tier 3 requirement', location: 'The Legacy', host: 'Nyx De Danaan', type: 'entertainment' },
-            { day: 'Fri 6/20', time: '12:00', duration: 300, title: 'Dark Star Of the Abyss Smalls Activity Day', location: 'Dark Star of the Abyss', host: 'Lady Lavender Belle', type: 'crafts' },
-            { day: 'Fri 6/20', time: '12:30', duration: 30, title: 'Bad Poetry - Tier 3 requirement', location: 'The Legacy', host: 'Nyx De Danaan', type: 'entertainment' },
-            { day: 'Fri 6/20', time: '13:00', duration: 30, title: 'Punification! - Tier 3 requirement', location: 'The Legacy', host: 'Nyx De Danaan', type: 'entertainment' },
-            { day: 'Fri 6/20', time: '13:00', duration: 60, title: 'The Lucet: Cord Braiding', location: 'Immersion Village', host: 'Audry the Wanderer', type: 'crafts' },
-            { day: 'Fri 6/20', time: '13:00', duration: 60, title: 'Teen Board Game Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen' },
-            { day: 'Fri 6/20', time: '14:00', duration: 60, title: 'Consent Discussion Session', location: 'Legacy Bay Inn', host: 'RockBiter', type: 'discussion' },
-            { day: 'Fri 6/20', time: '14:00', duration: 60, title: 'Queen\'s Embroidery and Tea', location: 'Immersion Village', host: 'Brookehilda the Strawberrian', type: 'crafts' },
-            { day: 'Fri 6/20', time: '15:00', duration: 60, title: 'DND One Shot', location: 'Lost Cove', host: 'Peaches', type: 'teen' },
-            { day: 'Fri 6/20', time: '15:00', duration: 60, title: 'Building Better Boffers', location: 'Immersion Village', host: 'K\'O the Sap', type: 'crafts' },
-            { day: 'Fri 6/20', time: '15:00', duration: 60, title: 'Spear Toss', location: 'Spear Range', host: 'Gerard', type: 'combat' },
-            { day: 'Fri 6/20', time: '16:00', duration: 60, title: 'Opening Court', location: 'The Legacy', host: 'Brookehilda the Strawberrian', type: 'official' },
-            { day: 'Fri 6/20', time: '16:00', duration: 120, title: 'Sink yar Sorrows', location: 'Legacy Bay Inn', host: 'Maella the Seawitch', type: 'games' },
-            { day: 'Fri 6/20', time: '16:00', duration: 480, title: 'Pirate Booty Carnival', location: 'Goblin Queen\'s Revenge', host: 'Spymaster Kerberus', type: 'games' },
-            { day: 'Fri 6/20', time: '17:00', duration: 180, title: 'Whirly Gig', location: 'Wayward Tides', host: 'Lady Mae & Wilhelm', type: 'games' },
-            { day: 'Fri 6/20', time: '18:00', duration: 60, title: 'Rum Runners', location: 'Rally\'s Revenge/Goblin Queen\'s Revenge', host: 'Nyx De Danan', type: 'games' },
-            { day: 'Fri 6/20', time: '20:00', duration: 120, title: 'Treasure Planet', location: 'Dark Star of the Abyss', host: 'Lady Lavender Belle', type: 'food' },
-            { day: 'Fri 6/20', time: '21:00', duration: 180, title: 'Battle Shots!', location: 'Goblin Queen\'s Revenge', host: 'Nyx De Danan', type: 'food' },
+            { day: 'Fri 6/20', time: '10:00', duration: 60, title: 'MTG Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen', description: 'This is dedicated time for teens to come and play or learn how to play Magic the Gathering.' },
+            { day: 'Fri 6/20', time: '10:00', duration: 60, title: 'Spear Toss', location: 'Spear Range', host: 'Gerard', type: 'combat', description: 'Come to the East County Buccaneers Spear Range to test that throwing arm! Can you hit the target? We\'d like to see you try!' },
+            { day: 'Fri 6/20', time: '10:00', duration: 420, title: 'Monkey See, Money Do Trading Booth', location: 'Revenant Embrace', host: 'Lynn Butterfield', type: 'trading', description: 'This will be a designated place for our monkeys to come and trade for trinkets, shinies, and yummies (individually wrapped candies and such).' },
+            { day: 'Fri 6/20', time: '10:00', duration: 480, title: 'Fair Winds Lottery', location: 'Fair Winds Lottery Booth', host: 'Spymaster Kerberus', type: 'games', description: 'Pirates love to Gamble…. and Win! There are three different types of lottery you can participate in. The Deed Lottery/Treasure Hunt: Scratch-off/Davy Jones Lotto: Raffle!!' },
+            { day: 'Fri 6/20', time: '12:00', duration: 30, title: 'Longest John - Tier 3 requirement', location: 'The Legacy', host: 'Nyx De Danaan', type: 'entertainment', description: 'Tell us your biggest Fish Story, Can you make us believe you?' },
+            { day: 'Fri 6/20', time: '12:00', duration: 300, title: 'Dark Star Of the Abyss Smalls Activity Day', location: 'Dark Star of the Abyss', host: 'Lady Lavender Belle', type: 'crafts', description: 'Dark Star Of the Abyss offers activities for Smalls 8 & up, Under 8 welcome with parental supervision. We will have many stations with great activities. Knot tying, coloring, board games. lawn games.' },
+            { day: 'Fri 6/20', time: '12:30', duration: 30, title: 'Bad Poetry - Tier 3 requirement', location: 'The Legacy', host: 'Nyx De Danaan', type: 'entertainment', description: 'Give us your worst limericks, sonnets, Haikus and what-nots. We\'re a bunch of uncultured swine who want to hear your Bad Poetry!' },
+            { day: 'Fri 6/20', time: '13:00', duration: 30, title: 'Punification! - Tier 3 requirement', location: 'The Legacy', host: 'Nyx De Danaan', type: 'entertainment', description: 'Show us your story telling skills by using at many puns as you can! Visual aids are always fun!' },
+            { day: 'Fri 6/20', time: '13:00', duration: 60, title: 'The Lucet: Cord Braiding', location: 'Immersion Village', host: 'Audry the Wanderer', type: 'crafts', description: 'Come learn how to make lucet cordage! This class will start you off with the fundamental techniques so you too can use it to accessorize your person or your camp.' },
+            { day: 'Fri 6/20', time: '13:00', duration: 60, title: 'Teen Board Game Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen', description: 'All teens are welcome to Lost Cove during this time to play board games and even get to learn some new ones!' },
+            { day: 'Fri 6/20', time: '14:00', duration: 60, title: 'Consent Discussion Session', location: 'Legacy Bay Inn', host: 'RockBiter', type: 'discussion', description: 'Discuss concepts relating to consent and consent incidents, as well as basic terminology and a Q&A session with the facilitator.' },
+            { day: 'Fri 6/20', time: '14:00', duration: 60, title: 'Queen\'s Embroidery and Tea', location: 'Immersion Village', host: 'Brookehilda the Strawberrian', type: 'crafts', description: 'Arrr, come learn the fine art o\' embroidery, where ye\'ll stitch like a true buccaneer and craft yer own treasure o\' thread! All supplies be provided—just bring yer crafty spirit and prepare for a voyage of needle and cloth!' },
+            { day: 'Fri 6/20', time: '15:00', duration: 60, title: 'DND One Shot', location: 'Lost Cove', host: 'Peaches', type: 'teen', description: 'This is a one shot led in Lost Cove for all of our teenage pirates! Come and have fun, regardless of experience!' },
+            { day: 'Fri 6/20', time: '15:00', duration: 60, title: 'Building Better Boffers', location: 'Immersion Village', host: 'K\'O the Sap', type: 'crafts', description: 'Come craft improved boffer swords and learn about evolving standards in boffer safety.' },
+            { day: 'Fri 6/20', time: '15:00', duration: 60, title: 'Spear Toss', location: 'Spear Range', host: 'Gerard', type: 'combat', description: 'Come to the East County Buccaneers Spear Range to test that throwing arm! Can you hit the target? We\'d like to see you try!' },
+            { day: 'Fri 6/20', time: '16:00', duration: 60, title: 'Opening Court', location: 'The Legacy', host: 'Brookehilda the Strawberrian', type: 'official', description: 'The official beginning of the weekend! Come hear important announcements, and get a glimpse of what we have in store for you!' },
+            { day: 'Fri 6/20', time: '16:00', duration: 120, title: 'Sink yar Sorrows', location: 'Legacy Bay Inn', host: 'Maella the Seawitch', type: 'games', description: 'Battleship on the high seas can be different. BYOD to sink your opponent\'s battleship before they drink yours!' },
+            { day: 'Fri 6/20', time: '16:00', duration: 480, title: 'Pirate Booty Carnival', location: 'Goblin Queen\'s Revenge', host: 'Spymaster Kerberus', type: 'games', description: 'For 50 Sterling you get to play a game randomly chosen for guaranteed prize! For a ring to grand prizes like a glass decanter. Open to all ages!' },
+            { day: 'Fri 6/20', time: '17:00', duration: 180, title: 'Whirly Gig', location: 'Wayward Tides', host: 'Lady Mae & Wilhelm', type: 'games', description: 'Earn points by successful completion of levels, how many hoops. Complete as many as possible. (Defender of Nassau Challenge)' },
+            { day: 'Fri 6/20', time: '18:00', duration: 60, title: 'Rum Runners', location: 'Rally\'s Revenge/Goblin Queen\'s Revenge', host: 'Nyx De Danan', type: 'games', description: 'On a Game board each opponent starts at their home island with 2 cargo containers and a dinghy. The object of the game is to steal the other persons cargo and bring it back to their home Island. First to do this is the winner. But! The dice rule the board and you could end up dueling each other in a high seas battle or get sunk by a sea monster! Who will triumph in securing the rum?! (Defender of Nassau Challenge)' },
+            { day: 'Fri 6/20', time: '20:00', duration: 120, title: 'Treasure Planet', location: 'Dark Star of the Abyss', host: 'Lady Lavender Belle', type: 'food', description: 'Come join us for Dinner & a show. Peg Legs with Tac, Cannon Balls, Barnacles & Scurvy Tonic. Suggested donation $6, Kraken Scales & Pirate Booty free for those attending.' },
+            { day: 'Fri 6/20', time: '21:00', duration: 180, title: 'Battle Shots!', location: 'Goblin Queen\'s Revenge', host: 'Nyx De Danan', type: 'food', description: 'Bring yer sterling and prepare your taste buds! It\'s time for the Annual Goblin Queen\'s Revenge Ship\'s jello shot competition! Sample our Crew\'s creations, vote for your favorite! The winning shot will be served at our Tavern Row Party at Tortuga!' },
             
             // Saturday, June 21
-            { day: 'Sat 6/21', time: '08:00', duration: 120, title: 'Veteran\'s Pancake Breakfast', location: 'Dark Star of the Abyss', host: 'Lady Lavender Belle', type: 'food' },
-            { day: 'Sat 6/21', time: '10:00', duration: 60, title: 'Sober Meet-Up', location: 'Dark Star of the Abyss', host: 'Lady Lavender Belle', type: 'discussion' },
-            { day: 'Sat 6/21', time: '10:00', duration: 60, title: 'MTG Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen' },
-            { day: 'Sat 6/21', time: '10:00', duration: 420, title: 'Monkey See, Money Do Trading Booth', location: 'Revenant Embrace', host: 'Lynn Butterfield', type: 'trading' },
-            { day: 'Sat 6/21', time: '10:00', duration: 480, title: 'Fair Winds Lottery', location: 'Fair Winds Lottery Booth', host: 'Spymaster Kerberus', type: 'games' },
-            { day: 'Sat 6/21', time: '10:00', duration: 60, title: 'Garb and Accessories', location: 'Immersion Village', host: 'Princess Devi', type: 'crafts' },
-            { day: 'Sat 6/21', time: '11:00', duration: 60, title: 'Beginner Hula', location: 'Immersion Village', host: 'Princess Devi', type: 'entertainment' },
-            { day: 'Sat 6/21', time: '11:00', duration: 60, title: 'Consent Discussion Session', location: 'Legacy Bay Inn', host: 'RockBiter', type: 'discussion' },
-            { day: 'Sat 6/21', time: '11:00', duration: 60, title: 'Brass Monkey Balls', location: 'Crimson Corsair', host: 'Captain Wreckless', type: 'games' },
-            { day: 'Sat 6/21', time: '11:00', duration: 60, title: 'Teen Escape Room', location: 'Lost Cove', host: 'Peaches', type: 'teen' },
-            { day: 'Sat 6/21', time: '12:00', duration: 60, title: 'Spear Toss', location: 'Spear Range', host: 'Gerard', type: 'combat' },
-            { day: 'Sat 6/21', time: '12:00', duration: 90, title: 'Chainmail 101', location: 'Immersion Village', host: 'Nyx De Danann', type: 'crafts' },
-            { day: 'Sat 6/21', time: '12:00', duration: 120, title: 'Ringing the Shaft', location: 'Legacy Bay Inn', host: 'Mealla the Seawitch', type: 'games' },
-            { day: 'Sat 6/21', time: '13:00', duration: 60, title: 'Rich Pirate, Poor Pirate', location: 'Immersion Village', host: 'K\'O the Sap', type: 'discussion' },
-            { day: 'Sat 6/21', time: '13:00', duration: 60, title: 'Treasure Hunt', location: 'Monkey Island', host: 'One Eyed Jax', type: 'games' },
-            { day: 'Sat 6/21', time: '13:00', duration: 60, title: 'Viking Pillow Fight', location: 'Immersion Village', host: 'Vindal', type: 'combat' },
-            { day: 'Sat 6/21', time: '13:00', duration: 60, title: 'Irish Crochet', location: 'Immersion Village', host: 'Winter Rose', type: 'crafts' },
-            { day: 'Sat 6/21', time: '13:00', duration: 60, title: 'Teen Board Game Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen' },
-            { day: 'Sat 6/21', time: '13:00', duration: 180, title: 'Royal Tablero Tournament', location: 'House of the Blue Wyrm', host: 'Bastian', type: 'games' },
-            { day: 'Sat 6/21', time: '14:00', duration: 60, title: 'Consent Discussion Session', location: 'Legacy Bay Inn', host: 'RockBiter', type: 'discussion' },
-            { day: 'Sat 6/21', time: '14:00', duration: 60, title: 'Dueling Pistols', location: 'Immersion Village', host: 'Vindal', type: 'combat' },
-            { day: 'Sat 6/21', time: '14:00', duration: 120, title: 'Emry\'s Trade Blanket', location: 'Rendezvous Point', host: 'Emry Watson', type: 'trading' },
-            { day: 'Sat 6/21', time: '14:00', duration: 120, title: 'Shit on Your Neighbor', location: 'Legacy Bay Inn', host: 'Mealla the Seawitch', type: 'games' },
-            { day: 'Sat 6/21', time: '15:00', duration: 60, title: 'Youth Bank Raid', location: 'Monkey Island', host: 'Squirrel', type: 'combat' },
-            { day: 'Sat 6/21', time: '16:00', duration: 60, title: 'Youth Pirate Parade', location: 'Monkey Island', host: 'Squirrel', type: 'entertainment' },
-            { day: 'Sat 6/21', time: '16:00', duration: 480, title: 'Pirate Booty Carnival', location: 'Goblin Queen\'s Revenge', host: 'Spymaster Kerberus', type: 'games' },
-            { day: 'Sat 6/21', time: '17:00', duration: 120, title: 'Dungeons & Dragons: The Port Nassau Story', location: 'The Legacy', host: 'Bastian', type: 'entertainment' },
-            { day: 'Sat 6/21', time: '18:30', duration: 330, title: 'Underground Casino', location: 'Legacy Bay Inn', host: 'Mealla the Seawitch', type: 'games' },
-            { day: 'Sat 6/21', time: '19:30', duration: 60, title: 'D&D Character Building Class', location: 'Rendezvous Point', host: 'Bastian', type: 'crafts' },
-            { day: 'Sat 6/21', time: '20:00', duration: 120, title: 'Teen Casino Night Party', location: 'Lost Cove', host: 'Peaches', type: 'teen' },
-            { day: 'Sat 6/21', time: '20:00', duration: 180, title: 'Open Stage Music and Entertainment', location: 'Immersion Village', host: 'Princess Devi', type: 'entertainment' },
-            { day: 'Sat 6/21', time: '21:00', duration: 180, title: 'Battle Shots!', location: 'Goblin Queen\'s Revenge', host: 'Nyx De Danan', type: 'food' },
+            { day: 'Sat 6/21', time: '08:00', duration: 120, title: 'Veteran\'s Pancake Breakfast', location: 'Dark Star of the Abyss', host: 'Lady Lavender Belle', type: 'food', description: 'Let us celebrate you & your family with an amazing pancake breakfast.' },
+            { day: 'Sat 6/21', time: '10:00', duration: 60, title: 'Sober Meet-Up', location: 'Dark Star of the Abyss', host: 'Lady Lavender Belle', type: 'discussion', description: 'Feel the need to talk, be around like-minded people. We will even have children\'s activities on ship for your smalls.' },
+            { day: 'Sat 6/21', time: '10:00', duration: 60, title: 'MTG Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen', description: 'This is dedicated time for teens to come and play or learn how to play Magic the Gathering.' },
+            { day: 'Sat 6/21', time: '10:00', duration: 420, title: 'Monkey See, Money Do Trading Booth', location: 'Revenant Embrace', host: 'Lynn Butterfield', type: 'trading', description: 'This will be a designated place for our monkeys to come and trade for trinkets, shinies and yummies (individually wrapped candies and such).' },
+            { day: 'Sat 6/21', time: '10:00', duration: 480, title: 'Fair Winds Lottery', location: 'Fair Winds Lottery Booth', host: 'Spymaster Kerberus', type: 'games', description: 'Pirates love to Gamble…. and Win! There are three different types of lottery you can participate in. The Deed Lottery/Treasure Hunt: Scratch-off/Davy Jones Lotto: Raffle!!' },
+            { day: 'Sat 6/21', time: '10:00', duration: 60, title: 'Garb and Accessories', location: 'Immersion Village', host: 'Princess Devi', type: 'crafts', description: 'Finding your style- what to do with what you have collected. Let\'s play dress up!' },
+            { day: 'Sat 6/21', time: '11:00', duration: 60, title: 'Beginner Hula', location: 'Immersion Village', host: 'Princess Devi', type: 'entertainment', description: 'A beginner mele {song} and simply movements in the auana and kahiko style' },
+            { day: 'Sat 6/21', time: '11:00', duration: 60, title: 'Consent Discussion Session', location: 'Legacy Bay Inn', host: 'RockBiter', type: 'discussion', description: 'Discuss concepts relating to consent and consent incidents, as well as basic terminology and a Q&A session with the facilitator.' },
+            { day: 'Sat 6/21', time: '11:00', duration: 60, title: 'Brass Monkey Balls', location: 'Crimson Corsair', host: 'Captain Wreckless', type: 'games', description: 'Paddle of the Balls (Defender of Nassau Challenge)' },
+            { day: 'Sat 6/21', time: '11:00', duration: 60, title: 'Teen Escape Room', location: 'Lost Cove', host: 'Peaches', type: 'teen', description: 'All teenaged pirates come to Lost Cove for a fun escape room game with a pirate theme! Let\'s team up and escape the game together!' },
+            { day: 'Sat 6/21', time: '12:00', duration: 60, title: 'Spear Toss', location: 'Spear Range', host: 'Gerard', type: 'combat', description: 'Come to the East County Buccaneers Spear Range to test that throwing arm! Can you hit the target? We\'d like to see you try! (Defender of Nassau Challenge)' },
+            { day: 'Sat 6/21', time: '12:00', duration: 90, title: 'Chainmail 101', location: 'Immersion Village', host: 'Nyx De Danann', type: 'crafts', description: 'In this class I will be teaching the basic 4-in-1 weave used in all chainmail armor making and the elegant Byzantine weave! The best part is you keep what you make! Supplies are limited so it is first come first serve.' },
+            { day: 'Sat 6/21', time: '12:00', duration: 120, title: 'Ringing the Shaft', location: 'Legacy Bay Inn', host: 'Mealla the Seawitch', type: 'games', description: 'See if you can move the ring from one shaft to another without your hands. The contest of who can control their Shaft the best!' },
+            { day: 'Sat 6/21', time: '13:00', duration: 60, title: 'Rich Pirate, Poor Pirate', location: 'Immersion Village', host: 'K\'O the Sap', type: 'discussion', description: 'Join a discussion on earning and spending Sterling. Learn new ways to bolster your bank account, make long term investments in your fellow pirates, and increase your immersive experience at events!' },
+            { day: 'Sat 6/21', time: '13:00', duration: 60, title: 'Treasure Hunt', location: 'Monkey Island', host: 'One Eyed Jax', type: 'games', description: 'There be buried treasure at Port Nassau! Any small pirates who want to seek their fortune come help me follow the treasure map!' },
+            { day: 'Sat 6/21', time: '13:00', duration: 60, title: 'Viking Pillow Fight', location: 'Immersion Village', host: 'Vindal', type: 'combat', description: 'Are you agile, brave and cunning ? Test your skills in the Viking traditional pillow fight! (Defender of Nassau Challenge)' },
+            { day: 'Sat 6/21', time: '13:00', duration: 60, title: 'Irish Crochet', location: 'Immersion Village', host: 'Winter Rose', type: 'crafts', description: 'Have tea and learn how to make Aran jumper stitches dating back to the late 1800s.' },
+            { day: 'Sat 6/21', time: '13:00', duration: 60, title: 'Teen Board Game Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen', description: 'All teens are welcome to Lost Cove during this time to play board games and even get to learn some new ones!' },
+            { day: 'Sat 6/21', time: '13:00', duration: 180, title: 'Royal Tablero Tournament', location: 'House of the Blue Wyrm', host: 'Bastian', type: 'games', description: 'Royal Tablero Tournament: Roll, Drink, Conquer! Join the ultimate showdown where strategy meets chance—and the chips are shot glasses filled with your beverage of choice. Roll the dice, place your pieces, and battle for the center row. Outsmart, outdrink, and outscore your opponents. Limited spots—bring your game face and your favorite drink! (Defender of Nassau Challenge)' },
+            { day: 'Sat 6/21', time: '14:00', duration: 60, title: 'Consent Discussion Session', location: 'Legacy Bay Inn', host: 'RockBiter', type: 'discussion', description: 'Discuss concepts relating to consent and consent incidents, as well as basic terminology and a Q&A session with the facilitator.' },
+            { day: 'Sat 6/21', time: '14:00', duration: 60, title: 'Dueling Pistols', location: 'Immersion Village', host: 'Vindal', type: 'combat', description: '5 Paces, steady and true aim and fire - bracket elimination (Defender of Nassau Challenge)' },
+            { day: 'Sat 6/21', time: '14:00', duration: 120, title: 'Emry\'s Trade Blanket', location: 'Rendezvous Point', host: 'Emry Watson', type: 'trading', description: 'Barter your Goods for Others\' Treasures' },
+            { day: 'Sat 6/21', time: '14:00', duration: 120, title: 'Shit on Your Neighbor', location: 'Legacy Bay Inn', host: 'Mealla the Seawitch', type: 'games', description: 'This exciting card game allows you to do your best to make your neighbor regret sitting next to you. Similar to rummy, this is 7 different hands of play to get your neighbor stuck with the most points.' },
+            { day: 'Sat 6/21', time: '15:00', duration: 60, title: 'Youth Bank Raid', location: 'Monkey Island', host: 'Squirrel', type: 'combat', description: 'Wanted: our fiercest young pirates, rebels, and fantasy folk to assist with a raid of the Port Nassau Bank. Bring your boffers, shields, and rebel spirit!' },
+            { day: 'Sat 6/21', time: '16:00', duration: 60, title: 'Youth Pirate Parade', location: 'Monkey Island', host: 'Squirrel', type: 'entertainment', description: 'Dress in your finest garb, bring your flag and make some noise as we parade our "guest" (prisoner) throughout the Nassau Nation.' },
+            { day: 'Sat 6/21', time: '16:00', duration: 480, title: 'Pirate Booty Carnival', location: 'Goblin Queen\'s Revenge', host: 'Spymaster Kerberus', type: 'games', description: 'For 50 Sterling you get to play a game randomly chosen for guaranteed prize! For a ring to grand prizes like a glass decanter. Open to all ages!' },
+            { day: 'Sat 6/21', time: '17:00', duration: 120, title: 'Dungeons & Dragons: The Port Nassau Story', location: 'The Legacy', host: 'Bastian', type: 'entertainment', description: 'For years, you\'ve lived your Legacy Bay characters through Port Nassau and Tortuga events. Now, step into Dungeons & Dragons and bring those stories to life in a deeper, more immersive way. Your choices, rivalries, and alliances won\'t reset—they\'ll shape a new adventure filled with high-seas danger, political intrigue, and ancient secrets. The legacy you\'ve built continues here, with dice in hand.' },
+            { day: 'Sat 6/21', time: '18:30', duration: 330, title: 'Underground Casino', location: 'Legacy Bay Inn', host: 'Mealla the Seawitch', type: 'games', description: 'Have sterling to spend? Want to take a chance and win more? Games of Blackjack, Poker, and possibly more are awaiting you!' },
+            { day: 'Sat 6/21', time: '19:30', duration: 60, title: 'D&D Character Building Class', location: 'Rendezvous Point', host: 'Bastian', type: 'crafts', description: 'A Dungeons & Dragons character building class focused on Port Nassau and Tortuga helps you create a custom pirate-themed character who could sail the seas of our festivals. Choose your swashbuckling race, class, and backstory to bring your festival persona to life in the world of D&D!' },
+            { day: 'Sat 6/21', time: '20:00', duration: 120, title: 'Teen Casino Night Party', location: 'Lost Cove', host: 'Peaches', type: 'teen', description: 'Teenaged pirates come down to Lost Cove for fun, betting, games, music, food, drinks, and more! No sterling required to play!' },
+            { day: 'Sat 6/21', time: '20:00', duration: 180, title: 'Open Stage Music and Entertainment', location: 'Immersion Village', host: 'Princess Devi', type: 'entertainment', description: 'Come to the Immersion Village shape, bring your instruments, voice, talent and sign up to entertain the crowd - Local celebrities may be present!' },
+            { day: 'Sat 6/21', time: '21:00', duration: 180, title: 'Battle Shots!', location: 'Goblin Queen\'s Revenge', host: 'Nyx De Danan', type: 'food', description: 'Bring yer sterling and prepare your taste buds! It\'s time for the Annual Goblin Queen\'s Revenge Ship\'s jello shot competition! Sample our Crew\'s creations, vote for your favorite! The winning shot will be served at our Tavern Row Party at Tortuga!' },
             
             // Sunday, June 22
-            { day: 'Sun 6/22', time: '10:00', duration: 60, title: 'MTG Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen' },
-            { day: 'Sun 6/22', time: '10:00', duration: 480, title: 'Fair Winds Lottery', location: 'Fair Winds Lottery Booth', host: 'Spymaster Kerberus', type: 'games' },
-            { day: 'Sun 6/22', time: '11:00', duration: 60, title: 'Teen Board Game Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen' },
-            { day: 'Sun 6/22', time: '11:00', duration: 120, title: 'Pirate Pet Swagger', location: 'Legacy Bay Inn', host: 'Mealla the Seawitch', type: 'entertainment' },
-            { day: 'Sun 6/22', time: '12:00', duration: 60, title: 'Raid of the Dock', location: 'The Dock, Rally\'s Revenge', host: 'Harbor Master Anna Rally', type: 'combat' },
-            { day: 'Sun 6/22', time: '13:00', duration: 60, title: 'Nassau Rub 2025 Meet and Greet', location: 'Crimson Corsair', host: 'Captain Wreckless', type: 'official' },
-            { day: 'Sun 6/22', time: '13:00', duration: 120, title: 'Blades & Axe Tournament', location: 'Legacy Bay Inn', host: 'Madam Princess Bri & Misthree', type: 'combat' },
-            { day: 'Sun 6/22', time: '16:00', duration: 60, title: 'Closing Court', location: 'The Legacy', host: 'Brookehilda the Strawberrian', type: 'official' },
-            { day: 'Sun 6/22', time: '16:00', duration: 480, title: 'Pirate Booty Carnival', location: 'Goblin Queen\'s Revenge', host: 'Spymaster Kerberus', type: 'games' },
-            { day: 'Sun 6/22', time: '21:00', duration: 180, title: 'Battle Shots!', location: 'Goblin Queen\'s Revenge', host: 'Nyx De Danan', type: 'food' }
-        ];
-
-        // Generate time slots (15-minute intervals from 8:00 to 24:00)
+            { day: 'Sun 6/22', time: '10:00', duration: 60, title: 'MTG Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen', description: 'This is dedicated time for teens to come and play or learn how to play Magic the Gathering.' },
+            { day: 'Sun 6/22', time: '10:00', duration: 480, title: 'Fair Winds Lottery', location: 'Fair Winds Lottery Booth', host: 'Spymaster Kerberus', type: 'games', description: 'Pirates love to Gamble…. and Win! There are three different types of lottery you can participate in. The Deed Lottery/Treasure Hunt: Scratch-off/Davy Jones Lotto: Raffle!!' },
+            { day: 'Sun 6/22', time: '11:00', duration: 60, title: 'Teen Board Game Hour', location: 'Lost Cove', host: 'Peaches', type: 'teen', description: 'All teens are welcome to Lost Cove during this time to play board games and even get to learn some new ones!' },
+            { day: 'Sun 6/22', time: '11:00', duration: 120, title: 'Pirate Pet Swagger', location: 'Legacy Bay Inn', host: 'Mealla the Seawitch', type: 'entertainment', description: 'Come show off your furry, feathered, or scaled little scallywags. We want to see them strut their stuff and show off their talents or cuteness. Registration can be found on the Legacy Bay Inn facebook page.' },
+            { day: 'Sun 6/22', time: '12:00', duration: 60, title: 'Raid of the Dock', location: 'The Dock, Rally\'s Revenge', host: 'Harbor Master Anna Rally', type: 'combat', description: 'Monkey Island and Lost Cove will visit the ships on The Dock to "raid" dock crews who must defend via boffer battle. Adults are welcome to join as well and all participants will be rewarded with popsicles and ice cream at Rally\'s Revenge after.' },
+            { day: 'Sun 6/22', time: '13:00', duration: 60, title: 'Nassau Rub 2025 Meet and Greet', location: 'Crimson Corsair', host: 'Captain Wreckless', type: 'official', description: 'Come meet your match and enjoy a drink with your Rub hosts, the Crimson Corsair! We will gather for a toast and a laugh as we reveal the Rub matches for this years event. Come say thanks, share a last gift, and raise a glass before the event departs for another year! (N/A and adult beverages available)' },
+            { day: 'Sun 6/22', time: '13:00', duration: 120, title: 'Blades & Axe Tournament', location: 'Legacy Bay Inn', host: 'Madam Princess Bri & Misthree', type: 'combat', description: 'The annual boffer and axe throwing tournament held by Madam Princess Bri and Sirius Black. Bring your boffer, we have the axes. Fight for the crown or be a scallywag.' },
+            { day: 'Sun 6/22', time: '16:00', duration: 60, title: 'Closing Court', location: 'The Legacy', host: 'Brookehilda the Strawberrian', type: 'official', description: 'Recap the event! Find out who our new Defender is! Listen to Brookehilda\'s fart jokes!' },
+            { day: 'Sun 6/22', time: '16:00', duration: 480, title: 'Pirate Booty Carnival', location: 'Goblin Queen\'s Revenge', host: 'Spymaster Kerberus', type: 'games', description: 'For 50 Sterling you get to play a game randomly chosen for guaranteed prize! For a ring to grand prizes like a glass decanter. Open to all ages!' },
+            { day: 'Sun 6/22', time: '21:00', duration: 180, title: 'Battle Shots!', location: 'Goblin Queen\'s Revenge', host: 'Nyx De Danan', type: 'food', description: 'Bring yer sterling and prepare your taste buds! It\'s time for the Annual Goblin Queen\'s Revenge Ship\'s jello shot competition! Sample our Crew\'s creations, vote for your favorite! The winning shot will be served at our Tavern Row Party at Tortuga!' }
+        ];// Generate time slots (30-minute intervals from 8:00 to 24:00)
         function generateTimeSlots() {
             const slots = [];
             for (let hour = 8; hour < 24; hour++) {
@@ -361,13 +477,13 @@
 
                 timeSlots.forEach(timeSlot => {
                     const slotMinutes = timeToMinutes(timeSlot);
-                    const slotEndMinutes = slotMinutes + 15;
-
-                    // Check if this 15-minute slot overlaps with the event
+                    const slotEndMinutes = slotMinutes + 30;                    // Check if this 30-minute slot overlaps with the event
                     const isOverlapping = (slotMinutes < eventEndMinutes && slotEndMinutes > eventStartMinutes);
                     
                     if (isOverlapping) {
-                        html += `<td class="time-slot filled type-${event.type}"></td>`;
+                        html += `<td class="time-slot filled type-${event.type}">
+                            <div class="time-text">${timeSlot}</div>
+                        </td>`;
                     } else {
                         html += '<td class="time-slot"></td>';
                     }
@@ -378,22 +494,239 @@
 
             html += '</tbody></table></div>';
             return html;
-        }
-
-        // Handle day selection
+        }        // Handle day selection
         document.getElementById('daySelector').addEventListener('change', function(e) {
             const selectedDay = e.target.value;
             const container = document.getElementById('scheduleContainer');
             
+            // Hide event description when changing days
+            hideEventDescription();
+            
             if (selectedDay) {
                 container.innerHTML = generateSchedule(selectedDay);
+                // Add event listeners after generating the schedule
+                addHighlightEventListeners();
             } else {
                 container.innerHTML = '<div class="no-events">Please select a day to view the schedule</div>';
             }
         });
 
-        // Initialize
-        populateDropdown();
+        // Highlighting functionality
+        let currentHighlightedRow = -1;
+        let currentHighlightedColumn = -1;        function clearAllHighlights() {
+            // Remove all highlight classes
+            document.querySelectorAll('.highlight-row, .highlight-column, .highlight-event-title, .highlight-time-header').forEach(element => {
+                element.classList.remove('highlight-row', 'highlight-column', 'highlight-event-title', 'highlight-time-header');
+            });
+            currentHighlightedRow = -1;
+            currentHighlightedColumn = -1;
+            
+            // Hide expanded event description
+            hideEventDescription();
+        }function highlightRowAndColumn(rowIndex, columnIndex) {
+            clearAllHighlights();
+            
+            const table = document.querySelector('table');
+            if (!table) return;
+
+            currentHighlightedRow = rowIndex;
+            currentHighlightedColumn = columnIndex;
+
+            // Highlight the event row (all cells in the row)
+            const eventRow = table.rows[rowIndex + 1]; // +1 because of header row
+            if (eventRow) {
+                Array.from(eventRow.cells).forEach(cell => {
+                    cell.classList.add('highlight-row');
+                });
+                // Special highlight for event title
+                eventRow.cells[0].classList.add('highlight-event-title');
+            }
+
+            // Highlight the time column (all cells in the column)
+            Array.from(table.rows).forEach(row => {
+                if (row.cells[columnIndex + 1]) { // +1 because first column is event title
+                    row.cells[columnIndex + 1].classList.add('highlight-column');
+                }
+            });
+
+            // Special highlight for time header
+            const headerRow = table.rows[0];
+            if (headerRow && headerRow.cells[columnIndex + 1]) {
+                headerRow.cells[columnIndex + 1].classList.add('highlight-time-header');
+            }
+
+            // Show event description
+            const selectedDay = document.getElementById('daySelector').value;
+            const event = getEventByRowIndex(rowIndex, selectedDay);
+            if (event) {
+                showEventDescription(event, rowIndex);
+            }
+        }
+
+        function highlightRow(rowIndex) {
+            clearAllHighlights();
+            
+            const table = document.querySelector('table');
+            if (!table) return;
+
+            currentHighlightedRow = rowIndex;
+
+            // Highlight the entire event row
+            const eventRow = table.rows[rowIndex + 1]; // +1 because of header row
+            if (eventRow) {
+                Array.from(eventRow.cells).forEach(cell => {
+                    cell.classList.add('highlight-row');
+                });
+                // Special highlight for event title
+                eventRow.cells[0].classList.add('highlight-event-title');
+            }
+
+            // Show event description
+            const selectedDay = document.getElementById('daySelector').value;
+            const event = getEventByRowIndex(rowIndex, selectedDay);
+            if (event) {
+                showEventDescription(event, rowIndex);
+            }
+        }
+
+        function highlightColumn(columnIndex) {
+            clearAllHighlights();
+            
+            const table = document.querySelector('table');
+            if (!table) return;
+
+            currentHighlightedColumn = columnIndex;
+
+            // Highlight the entire time column
+            Array.from(table.rows).forEach(row => {
+                if (row.cells[columnIndex + 1]) { // +1 because first column is event title
+                    row.cells[columnIndex + 1].classList.add('highlight-column');
+                }
+            });
+
+            // Special highlight for time header
+            const headerRow = table.rows[0];
+            if (headerRow && headerRow.cells[columnIndex + 1]) {
+                headerRow.cells[columnIndex + 1].classList.add('highlight-time-header');
+            }
+        }
+
+        function addHighlightEventListeners() {
+            const table = document.querySelector('table');
+            if (!table) return;
+
+            // Add click listeners to time slot cells
+            document.querySelectorAll('.time-slot').forEach((cell, index) => {
+                cell.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Find row and column indices
+                    const row = cell.closest('tr');
+                    const rowIndex = Array.from(table.rows).indexOf(row) - 1; // -1 because of header
+                    const columnIndex = Array.from(row.cells).indexOf(cell) - 1; // -1 because of event title column
+                    
+                    if (currentHighlightedRow === rowIndex && currentHighlightedColumn === columnIndex) {
+                        // If clicking the same cell, clear highlights
+                        clearAllHighlights();
+                    } else {
+                        // Highlight both row and column
+                        highlightRowAndColumn(rowIndex, columnIndex);
+                    }
+                });
+            });            // Add click listeners to event titles (excluding header)
+            document.querySelectorAll('tbody .event-title').forEach((cell, index) => {
+                cell.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    if (currentHighlightedRow === index && currentHighlightedColumn === -1) {
+                        // If clicking the same event title, clear highlights
+                        clearAllHighlights();
+                    } else {
+                        // Highlight just the row
+                        highlightRow(index);
+                    }
+                });
+            });
+
+            // Add click listeners to time headers
+            document.querySelectorAll('.time-header').forEach((cell, index) => {
+                cell.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    if (currentHighlightedColumn === index && currentHighlightedRow === -1) {
+                        // If clicking the same time header, clear highlights
+                        clearAllHighlights();
+                    } else {
+                        // Highlight just the column
+                        highlightColumn(index);
+                    }
+                });
+            });
+
+            // Clear highlights when clicking outside the table
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('table')) {
+                    clearAllHighlights();
+                }
+            });
+        }        // Initialize
+        populateDropdown();        // Event description functions
+        let currentExpandedRow = null;
+
+        function showEventDescription(event, rowIndex) {
+            // Remove any existing expanded row
+            hideEventDescription();
+            
+            const table = document.querySelector('table tbody');
+            if (!table) return;
+
+            const eventRow = table.rows[rowIndex];
+            if (!eventRow) return;
+
+            // Create new description row
+            const descriptionRow = table.insertRow(rowIndex + 1);
+            descriptionRow.className = 'event-description-row';
+            currentExpandedRow = descriptionRow;
+
+            // Get the number of columns from the header
+            const headerRow = document.querySelector('table thead tr');
+            const columnCount = headerRow ? headerRow.cells.length : 1;
+
+            // Create a single cell that spans all columns
+            const descriptionCell = descriptionRow.insertCell(0);
+            descriptionCell.colSpan = columnCount;
+            descriptionCell.className = 'event-description-cell';
+
+            // Build the description content
+            descriptionCell.innerHTML = `
+                <button class="close-description" onclick="hideEventDescription()">&times;</button>
+                <h3>${event.title}</h3>
+                <div class="event-meta">
+                    <span>📅 ${event.day}</span>
+                    <span>⏰ ${event.time} (${event.duration} minutes)</span>
+                    <span>${event.location ? `📍 ${event.location}` : '📍 Location TBD'}</span>
+                    <span>${event.host ? `🎭 ${event.host}` : '🎭 Host TBD'}</span>
+                </div>
+                <div class="description-text">
+                    ${event.description || 'No description available.'}
+                </div>
+            `;
+
+            // Scroll to the expanded row
+            descriptionRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function hideEventDescription() {
+            if (currentExpandedRow) {
+                currentExpandedRow.remove();
+                currentExpandedRow = null;
+            }
+        }
+
+        function getEventByRowIndex(rowIndex, selectedDay) {
+            const dayEvents = events.filter(event => event.day === selectedDay);
+            return dayEvents[rowIndex] || null;
+        }
     </script>
 </body>
 </html>
