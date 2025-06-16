@@ -202,6 +202,7 @@
             background: rgba(0, 0, 0, 0.6);
             border: 2px solid #ffd700;
             animation: expandRow 0.3s ease-in-out;
+            position: relative;
         }
 
         @keyframes expandRow {
@@ -221,6 +222,9 @@
             padding: 20px;
             color: #fff;
             border: 1px solid #34495e;
+            width: 390px !important;
+            max-width: 390px !important;
+            position: relative;
         }
 
         .event-description-cell h3 {
@@ -671,9 +675,7 @@
             });
         }        // Initialize
         populateDropdown();        // Event description functions
-        let currentExpandedRow = null;
-
-        function showEventDescription(event, rowIndex) {
+        let currentExpandedRow = null;        function showEventDescription(event, rowIndex) {
             // Remove any existing expanded row
             hideEventDescription();
             
@@ -688,13 +690,8 @@
             descriptionRow.className = 'event-description-row';
             currentExpandedRow = descriptionRow;
 
-            // Get the number of columns from the header
-            const headerRow = document.querySelector('table thead tr');
-            const columnCount = headerRow ? headerRow.cells.length : 1;
-
-            // Create a single cell that spans all columns
+            // Create a single cell with fixed width (390px)
             const descriptionCell = descriptionRow.insertCell(0);
-            descriptionCell.colSpan = columnCount;
             descriptionCell.className = 'event-description-cell';
 
             // Build the description content
